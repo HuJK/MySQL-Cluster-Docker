@@ -1,0 +1,87 @@
+#!/bin/bash
+DAEMON=/usr/sbin/mysqld 
+OPTS="--daemonize --pid-file=/var/run/mysqld/mysqld.pid --log-error=/var/log/out.err"
+NAME=mysql
+DESC=mysql
+
+. /etc/init.d/functions
+
+test -x $DAEMON || exit 0
+set -e
+
+status()
+{
+    set +e
+    pids=$(ps -U mysql -o pid=)
+    set -e
+    if [ $(expr length "${pids}") != "0" ]; then
+        echo "MySQL Server is running: ${pids}"
+    else
+        echo "MySQL Server is not running"
+    fi
+
+}
+
+start()
+{
+    su -s /bin/bash mysql -c "${DAEMON} ${OPTS}"
+    return
+}
+ 
+stop()
+{
+    for i in {1..100};
+    do
+        if [ "$(status)" == "MySQL Server is not running" ]; then
+            #echo "Not running"
+            break
+        else
+            pkill -u mysql
+            sleep 1
+        fi
+    done
+    return
+}
+
+
+case "$1" in
+    start)
+        if [ "$(status)" == "MySQL Server is not running" ]; then
+            echo -n "Starting $DESC: "
+            start
+            echo "started."
+        else
+            echo "Already Started"
+        fi
+        ;;
+
+    stop)
+        if [ "$(status)" == "MySQL Server is not running" ]; then
+            echo "Not running"
+        else
+            echo -n "Stopping $DESC: "
+            stop
+            echo "stopped."
+        fi
+        ;;
+
+ 
+    status)
+        status
+        ;;
+
+    restart|force-reload)
+        echo -n "Restarting $DESC: "
+        stop
+        sleep 1
+        start
+        echo "restarted."
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|status|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

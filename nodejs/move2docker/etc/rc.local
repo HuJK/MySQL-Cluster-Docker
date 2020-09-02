@@ -1,0 +1,13 @@
+#!/bin/bash
+cd /root/restart
+tmux new -d -s restart_page "python3 /root/restart/restart_backend.py"
+cd /root/code
+set +e
+while true;
+do
+    tmux new -d -s page "node WebServer.js --max-old-space-size=2048"
+    sleep 1
+done
+touch /var/lock/subsys/local
+sleep infinity
+

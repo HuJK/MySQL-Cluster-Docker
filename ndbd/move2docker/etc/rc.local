@@ -1,0 +1,10 @@
+#!/bin/bash
+set -x
+if [ -d "/etc/notfirstrun" ] 
+then
+    exec ndbd --skip-daemon
+else
+    mkdir -p /etc/notfirstrun
+    exec ndbd --skip-daemon --initial
+fi
+
