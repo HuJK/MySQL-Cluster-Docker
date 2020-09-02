@@ -3,6 +3,8 @@ cd /root/restart
 tmux new -d -s restart_page "python3 /root/restart/restart_backend.py"
 cd /root/code
 set +e
+sleep 10
+/usr/sbin/nginx
 while true;
 do
     tmux new -d -s page "node WebServer.js --max-old-space-size=2048"

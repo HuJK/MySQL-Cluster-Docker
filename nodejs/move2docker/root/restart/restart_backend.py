@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import subprocess
-
+import logging
 
 class S(BaseHTTPRequestHandler):
     def _set_response(self):
